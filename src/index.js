@@ -14,8 +14,7 @@ const onCountryInput = () => {
     if (trimCountryinput !== "") {
         fetchCountries(trimCountryinput)
             .then((responseJSON) => {
-                countryInfoEl.innerHTML = "";
-                countryListEl.innerHTML = "";
+                clearMarkup();
                 
                 if (responseJSON.length > 10) {
                     Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
@@ -33,9 +32,17 @@ const onCountryInput = () => {
                     return;
                 };
             })
-            .catch((error) => Notiflix.Notify.failure("Oops, there is no country with that name"));
+            .catch((error) => {
+                clearMarkup();
+                return Notiflix.Notify.failure("Oops, there is no country with that name")});
     };
 };
+
+function clearMarkup() {
+    countryInfoEl.innerHTML = "";
+    countryListEl.innerHTML = "";
+};
+
 
 function showCountryInfo(responseJSON) {
     const countryInfoMarkup = responseJSON.map((country) =>
