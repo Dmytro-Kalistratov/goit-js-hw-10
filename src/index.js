@@ -14,18 +14,22 @@ const onCountryInput = () => {
     if (trimCountryinput !== "") {
         fetchCountries(trimCountryinput)
             .then((responseJSON) => {
+                countryInfoEl.innerHTML = "";
+                countryListEl.innerHTML = "";
+                
                 if (responseJSON.length > 10) {
                     Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
+
                     return;
                 }
                 if (responseJSON.length >= 2 && responseJSON.length <= 10) {
-                    console.log(responseJSON)
+
+                    countryListEl.insertAdjacentHTML("beforeend", showCountryList(responseJSON))
                     return;
                 }
                 if (responseJSON.length === 1) {
 
-                    countryInfoEl.innerHTML = "";
-                    countryInfoEl.insertAdjacentHTML("beforeend", createMarkup(responseJSON));
+                    countryInfoEl.insertAdjacentHTML("beforeend", showCountryInfo(responseJSON));
                     return;
                 };
             })
@@ -33,19 +37,25 @@ const onCountryInput = () => {
     };
 };
 
-function createMarkup(responseJSON) {
-    const countryMarkup = responseJSON.map((country) =>
-        `<li class="list-item">${country.name.official}</li>
-        <li class="list-item">${country.capital}</li>
-        <li class="list-item">${country.population}</li>
-        <li class="list-item"><img src="${country.flags.svg}" alt="Country flag" width="150"></li>
-        <li class="list-item">${Object.values(country.languages).join(", ")}</li>
+function showCountryInfo(responseJSON) {
+    const countryInfoMarkup = responseJSON.map((country) =>
+        `<h2>${country.name.official}</h2>
+        <p>Capital: ${country.capital}</p>
+        <p>Population: ${country.population}</p>
+        <img src="${country.flags.svg}" alt="Country flag" width="150">
+        <p>Languages: ${Object.values(country.languages).join(", ")}</p>
         `)
         .join('');
-    
-    console.log(responseJSON);
 
-    return countryMarkup;
+    return countryInfoMarkup;
+};
+
+function showCountryList(responseJSON) {
+    let countryListMarkup = responseJSON.reduce((countryListMarkup, country) =>
+        countryListMarkup +
+        `<li class="country-list__elem"><img src="${country.flags.svg}" alt="Country flag" width="30" heigth="30"> <h2>${country.name.official}</h2></li>`, "");
+
+    return countryListMarkup;
 };
 
 countryInput.addEventListener('input', debounce(onCountryInput, DEBOUNCE_DELAY));
